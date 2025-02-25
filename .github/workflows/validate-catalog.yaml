@@ -1,0 +1,31 @@
+name: leap-catalog
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *" # every day at midnight
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  single-feedstock:
+    uses: leap-stc/data-catalog-actions/.github/workflows/reusable-catalog-entry.yml@main
+    with:
+      python-version: "3.12"
+      feedstock-path: "./feedstock/catalog.yaml"
+      output-directory: "./"
+    secrets:
+      APP_ID: ${{ secrets.APP_ID }}
+      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
